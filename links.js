@@ -1,5 +1,4 @@
-let linkSections = {
-  "User Links": [], // Section for user-added links
+const linkSections = { 
   "DNS, CDN, DDOS": [
     ["Cloudflare", "https://www.cloudflare.com", "DNS CDN DDOS"]
   ],
@@ -22,8 +21,6 @@ let linkSections = {
     ["Cheat.sh", "https://cheat.sh", "Cheat Sheet"],
     ["CheatSheet", "https://lecoupa.github.io/awesome-cheatsheets/", "Cheat Sheet"],
     ["Cheat-Sheet", "https://lzone.de/cheat-sheet.html", "Cheat Sheet"],
-    ["PublicAPI", "https://public-apis.io", "API Info"],
-    ["PublicAPI2", "https://github.com/public-apis/public-apis", "API Info"],
     ["DevRoadmap", "https://roadmap.sh", "Learning Guides"],
     ["FastDesign", "https://www.fast.design", "Code Packages"],
     ["Libraries", "https://libraries.io", "Code Packages"],
@@ -34,12 +31,96 @@ let linkSections = {
     ["GitLab", "https://gitlab.com", "Code Colab"],
     ["Repl.it", "https://repl.it", "Code Colab"],
     ["SharePad", "https://www.sharepad.io", "Code Colab"],
-    ["3V4L", "https://3v4l.org", "Test Code"],
     ["CodePen", "https://codepen.io", "Explore Code"],
     ["CodeSandbox", "https://codesandbox.io/search", "Explore Code"],
-  ],
-  // Add other sections and their links
+    ["DevDocs", "https://devdocs.io", "WebDev Docs"],
+
+    ],
+  "Fonts": [
+    ["NerdFonts", "https://nerdfonts.com", "Fonts"],
+    ["GoogleFont", "https://google-webfonts-helper.herokuapp.com", "Fonts"],
+  ]
 };
+
+// Add other sections and their links
+let isAddingLink = false;
+let linkName = "";
+let linkUrl = "";
+
+
+function displayLinks() {
+  const terminal = document.getElementById("terminal");
+  let linksHTML = "";
+
+  // Iterate over link sections and create the links HTML string
+  for (const section in linkSections) {
+    linksHTML += `<div class="section-title">${section}</div>`;
+    linkSections[section].forEach(link => {
+      linksHTML += `<div data-url="${link[1]}" class="link">${link[0]}</div>`;
+    });
+  }
+
+  // Add the links HTML to the terminal
+  terminal.innerHTML = linksHTML;
+
+  // Add event listener to each link
+  const links = terminal.getElementsByClassName("link");
+  for (const link of links) {
+    link.addEventListener("keydown", handleInput);
+  }
+}
+
+function addLink() {
+  const terminal = document.getElementById("terminal");
+  const inputField = document.querySelector("#commandInput");
+
+  terminal.innerHTML += "<div>Please enter the name of the link:</div>";
+
+  function handleLinkNameInput(event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const linkName = inputField.value.trim();
+
+      terminal.innerHTML += "<div>URL for link:</div>";
+
+      // Remove event listener for link name input
+      inputField.removeEventListener("keydown", handleLinkNameInput);
+
+      // Listen for Enter key to capture link URL
+      inputField.addEventListener("keydown", handleLinkUrlInput);
+
+      function handleLinkUrlInput(event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          const linkUrl = inputField.value.trim();
+
+          // Save the link to local storage
+          saveUserLink(linkName, linkUrl);
+
+          // Display confirmation message
+          terminal.innerHTML += `
+            <div>Link added:</div>
+            <div>${linkName}: ${linkUrl}</div>
+          `;
+
+          // Clear the input field
+          inputField.value = "";
+
+          // Reset the flag and remove the event listener
+          isAddingLink = false;
+          inputField.removeEventListener("keydown", handleLinkUrlInput);
+
+          // Set the prompt to the default value
+          currentPrompt = "> ";
+          promptElement.innerText = currentPrompt;
+        }
+      }
+    }
+  }
+
+  // Add event listener for link name input
+  inputField.addEventListener("keydown", handleLinkNameInput);
+}
 
 
 function navigateLinkSelection(direction) {
@@ -57,121 +138,59 @@ function navigateLinkSelection(direction) {
   }
 
   linkElements[selectedLinkIndex].classList.add("selected-link");
-  linkElements[selectedLinkIndex].scrollIntoView({ behavior: "smooth", block: "nearest" });
+  linkElements[selectedLinkIndex].scrollIntoView({ behavior: "smooth", block: "nearest" }); //make the screen follow when selecting links
 }
 
-function linkAdd() {
+function handleCommandInput(event) {
   const inputField = document.querySelector("#commandInput");
-  const terminal = document.getElementById("terminal");
+  const command = inputField.value.trim();
 
-  if (!currentPrompt.includes("Link Name")) {
-    terminal.innerHTML += "<div>Please enter the name of the link:</div>";
-    currentPrompt = "Link Name > ";
-    promptElement.innerText = currentPrompt;
+  if (event.key === "Enter") {
+    if (isAddingLink) {
+      handleLinkInput(command);
+    } else {
+      handleRegularCommand(command);
+    }
+  }
+}
+
+function handleLinkInput(command) {
+  const terminal = document.getElementById("terminal");
+  const inputField = document.querySelector("#commandInput");
+
+  if (linkName === "") {
+    linkName = command;
+    terminal.innerHTML += "<div>URL for link:</div>";
+    inputField.value = "";
+  } else if (linkUrl === "") {
+    linkUrl = command;
+    saveUserLink(linkName, linkUrl);
+    terminal.innerHTML += `
+      <div>Link added:</div>
+      <div>${linkName}: ${linkUrl}</div>
+    `;
+    inputField.value = "";
+    isAddingLink = false;
+    linkName = "";
+    linkUrl = "";
+  }
+}
+
+
+
+
+function saveUserLink(name, url) {
+  let userLinks = localStorage.getItem("userLinks");
+
+  if (userLinks) {
+    userLinks = JSON.parse(userLinks);
+    userLinks[name] = url;
   } else {
-    const linkName = inputField.value.trim();
-
-    if (linkName.length === 0) {
-      terminal.innerHTML += "<div>Link name cannot be empty.</div>";
-      return;
-    }
-
-    terminal.innerHTML += "<div>Please enter the URL of the link:</div>";
-    currentPrompt = "Link URL > ";
-    promptElement.innerText = currentPrompt;
-
-    linkPrompt = true;
-    lastSearchQuery = linkName;
+    userLinks = { [name]: url };
   }
+
+  localStorage.setItem("userLinks", JSON.stringify(userLinks));
 }
 
-function addLink() {
-  const inputField = document.querySelector("#commandInput");
-  const terminal = document.getElementById("terminal");
 
-  const linkUrl = inputField.value.trim();
-  if (linkUrl.length === 0) {
-    terminal.innerHTML += "<div>Link URL cannot be empty.</div>";
-    return;
-  }
-
-  const linkName = lastSearchQuery;
-
-  let sectionFound = false;
-  let foundSection = null;
-
-  // Find the section to add the link or create a new section
-  for (const section in linkSections) {
-    if (linkSections.hasOwnProperty(section)) {
-      const links = linkSections[section];
-      for (const link of links) {
-        if (link[0].toLowerCase() === linkName.toLowerCase()) {
-          link[1] = linkUrl; // Update the link URL
-          sectionFound = true;
-          foundSection = section;
-          break;
-        }
-      }
-      if (sectionFound) {
-        break;
-      }
-    }
-  }
-
-  if (!sectionFound) {
-    foundSection = "User Links"; // Set the section name for user-added links
-    if (!linkSections.hasOwnProperty(foundSection)) {
-      linkSections[foundSection] = [];
-    }
-    linkSections[foundSection].push([linkName, linkUrl]);
-  }
-
-  terminal.innerHTML += "<div>Link added successfully.</div>";
-
-  // Clear the input field and reset the prompt
-  inputField.value = "";
-  currentPrompt = "> ";
-  promptElement.innerText = currentPrompt;
-
-  // Print the updated links
-  displayLinks();
-
-  // Save linkSections to local storage
-  saveLinkSections();
-}
-
-function displayLinks() {
-  const terminal = document.getElementById("terminal");
-  let linksHTML = "";
-
-  for (const section in linkSections) {
-    linksHTML += `<div class="section-title">${section}</div>`;
-    const links = linkSections[section];
-    for (const link of links) {
-      linksHTML += `<div class="link" data-url="${link[1]}">${link[0]}</div>`;
-    }
-  }
-
-  terminal.innerHTML = linksHTML;
-
-  const links = terminal.getElementsByClassName("link");
-  for (const link of links) {
-    link.addEventListener("keydown", handleInput);
-  }
-}
-
-// Load linkSections from local storage
-function loadLinkSections() {
-  const storedLinkSections = localStorage.getItem("linkSections");
-  if (storedLinkSections) {
-    linkSections = JSON.parse(storedLinkSections);
-  }
-}
-
-// Save linkSections to local storage
-function saveLinkSections() {
-  localStorage.setItem("linkSections", JSON.stringify(linkSections));
-}
-
-loadLinkSections();
-displayLinks();
+document.addEventListener("keydown", handleCommandInput);
