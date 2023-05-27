@@ -1,7 +1,7 @@
 // Assuming you have used ES6 modules for your files
 // and exported your classes
 import { TerminalRenderer } from './TerminalRenderer.js';
-import { OutputEngine } from './outputEngine.js';
+import { OutputEngine } from './OutputEngine.js';
 import { InputEngine } from './inputEngine.js';
 import { CommandEngine } from './CommandEngine.js';
 

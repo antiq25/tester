@@ -1,43 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>JavaScript Terminal</title>
-    <style>
-        #terminal {
-            width: 500px;
-            height: 300px;
-            border: 1px solid black;
-            padding: 10px;
-            overflow: auto;
-            background-color: #000;
-            color: #fff;
-            font-family: monospace;
-            display: flex;
-            flex-direction: column-reverse;
-        }
-
-        #terminal-output {
-            width: 100%;
-            height: 90%;
-            overflow-y: auto;
-        }
-
-        #terminal-input {
-            width: 100%;
-            color: #fff;
-            background-color: #000;
-            border: none;
-            outline: none;
-        }
-    </style>
+    <title>Web Terminal</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-    <div id="terminal">
-        <input id="terminal-input" type="text" />
-        <div id="terminal-output">
-            <!-- This is where the terminal output will go -->
+    <div class="terminal-container">
+        <div id="terminal">
+            <div class="terminal-header">
+                <div class="terminal-controls">
+                    <div class="terminal-dot terminal-dot-red"></div>
+                    <div class="terminal-dot terminal-dot-yellow"></div>
+                    <div class="terminal-dot terminal-dot-green"></div>
+                </div>
+                <div class="terminal-title">Terminal</div>
+            </div>
+            <div class="terminal-body">
+                <div id="terminal-output"></div>
+                <div id="input-line" class="input-line">
+                    <div class="prompt">></div>
+                    <input class="input" id="terminal-input" spellcheck="false" autofocus/>
+                </div>
+            </div>
         </div>
     </div>
-    <script type="module" src="./main.js"></script>
+    <script type="module" src="main.js"></script>
 </body>
 </html>
