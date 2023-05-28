@@ -12,7 +12,7 @@ const inputElement = document.querySelector('#terminal-input');
 // Initialize all components
 const terminalRenderer = new TerminalRenderer(terminalElement);
 const outputEngine = new OutputEngine(terminalRenderer);
-const commandEngine = new CommandEngine();
+const commandEngine = new CommandEngine(outputEngine);
 const inputEngine = new InputEngine(outputEngine, commandEngine);
 
 // Attach input engine's keypress handler to the input event of the terminal

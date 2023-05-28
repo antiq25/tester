@@ -1,43 +1,25 @@
+// CommandEngine.js
+import { commands } from './commands.js';
+
 export class CommandEngine {
-    constructor() {
-        this.commands = {
-            'help': this.help,
-            'date': this.date,
-            // add more commands as methods here
-        };
+    constructor(outputEngine) {
+        this.outputEngine = outputEngine;
+        this.commands = commands;
     }
-  
-    processCommand(command) {
-        if (this.commands[command]) {
-            return this.commands[command]();
+
+    processCommand(input) {
+        // Split the input into a command and its arguments
+        let parts = input.split(' ');
+        let commandName = parts[0];
+        let args = parts.slice(1);
+
+        // Check if the command exists in the commands object
+        if (this.commands[commandName]) {
+            // If it does, execute the command with the provided arguments
+            this.commands[commandName].call(this, ...args);
         } else {
-            return `Unknown command: ${command}`;
+            // If it doesn't, return an error message
+            return `Unknown command: ${commandName}`;
         }
     }
-  
-    help() {
-        // returns a help message
-        return `
-         commands:
-         [search] - google, brave, bing for now. type google to open google, or google <query> to search etc
-         [info]   - displays what terminal can see via platform.js
-         [ip]     - gets ip address 
-         [help]   - displays available commands
-         [links]  -  displays links + your links  
-         [link.add] - prompts you to create a link, then adds it to link tree.
-         [txt]    - creates txt edit (lots of work to do still on this)
-         [save]   - saves contents inside of txt editor into local storage
-         [load]   - loads local storage , displays into prompt
-         [cls]   - exits + clears prompt. (this is your reset)
-        created by antiq [github.com/antiq25]
-    `;
-    }
-  
-    date() {
-        // returns the current date
-        return new Date().toString();
-    }
-  }
-  
-
-  
+}
