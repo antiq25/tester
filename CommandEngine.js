@@ -16,10 +16,13 @@ export class CommandEngine {
         // Check if the command exists in the commands object
         if (this.commands[commandName]) {
             // If it does, execute the command with the provided arguments
-            this.commands[commandName].call(this, ...args);
+            const output = this.commands[commandName](...args);
+
+            // Print the output
+            this.outputEngine.print(output);
         } else {
             // If it doesn't, return an error message
-            return `Unknown command: ${commandName}`;
+            this.outputEngine.print(`Unknown command: ${commandName}`);
         }
     }
 }
