@@ -1,31 +1,37 @@
-// commands.js
-
 // Define your functions
-function random(min, max) {
-    min = Number(min);
-    max = Number(max);
+function random(outputEngine, min, max) {
+    min = Number('10');
+    max = Number('20');
     const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
-    return `Random number between ${min} and ${max}: ${randomNumber}`;
+    outputEngine.print(`Random number between ${min} and ${max}: ${randomNumber}`);
 }
 
-function reverse(string) {
+
+function reverse(outputEngine, string) {
     const reversed = string.split('').reverse().join('');
-    return `Reversed string: ${reversed}`;
+    outputEngine.print(`Reversed string: ${reversed}`);
 }
 
 // Add the two functions you provided
-function getIPData() {
+function getIPData(outputEngine) {
   // ... your function logic
+  // remember to use outputEngine.print to display any output
 }
 
-function displayPlatformInfo() {
+function displayPlatformInfo(outputEngine) {
   // ... your function logic
+  // remember to use outputEngine.print to display any output
 }
 
-// Export an object that references your functions
+function displayHelp(outputEngine) {
+  // your function logic here
+  outputEngine.print("Help information");
+}
+
 export const commands = {
-    random,
-    reverse,
-    getIPData,
-    displayPlatformInfo
+    "random": random,
+    "reverse": reverse,
+    "getip": getIPData,
+    "info": displayPlatformInfo,
+    "help": displayHelp
 };
